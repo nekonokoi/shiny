@@ -7,5 +7,7 @@ shinyServer(function(input,output){
       hist(iris$Sepal.Length)
     }
   )
+  #代入なので,はいらない
+  output$string1=renderText(input$string1)
 
 })
