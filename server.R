@@ -8,15 +8,7 @@ shinyServer(function(input,output){
 
 output$multi.chart<-renderPlot({
   par(mfrow=c(3,2))
-  name <- c(
-    #
-    "Sepal.Length",
-    "Sepal.Width",
-    "Petal.Length",
-    "Petal.Width",
-    "Species"
-
-    )
+  name <- names(iris)
   for(n in 1:length(name)){
     if(
       class(iris[,name[n]]) == "numeric"
