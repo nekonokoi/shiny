@@ -4,8 +4,14 @@ shinyUI(
   pageWithSidebar(
     headerPanel = headerPanel(title="iris hist"),
     mainPanel = mainPanel(
-      plotOutput("distPlot")
+            plotOutput("scatterPlot"),
+      tableOutput(
+        outputId = "regOutput"
+      ),
+            plotOutput("distPlot"),
+      plotOutput("qqPlot")
     ),
+
     sidebarPanel = sidebarPanel(
       #引数としてつないでいく
       textInput(
