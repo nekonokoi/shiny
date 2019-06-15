@@ -25,6 +25,17 @@ shinyUI(
         placeholder="place",
         width=NULL
         ),
+        textAreaInput(
+          inputId = "string2",
+          label = "sqlとか",
+          value="",
+          placeholder="place",
+          width="300px",
+          height="300px",
+          cols=NULL,
+          rows=NULL,
+          resize=NULL
+          ),
 
         selectInput(
         inputId="x",
