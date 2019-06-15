@@ -4,6 +4,10 @@ mdl=lm(Sepal.Length~Sepal.Width,data=iris)
 res=summary(mdl)
 
 shinyServer(function(input,output){
+
+output$view <- reactiveTable(function() {
+head(iris[c(input$x,input$y)])
+})
   output$scatterPlot <- renderPlot(
     {
       plot(iris$Sepal.Length,iris$Sepal.Width)

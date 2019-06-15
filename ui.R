@@ -4,7 +4,10 @@ shinyUI(
   pageWithSidebar(
     headerPanel = headerPanel(title="iris hist"),
     mainPanel = mainPanel(
-            plotOutput("scatterPlot"),
+    tableOutput(
+      outputId = "view"
+    ),
+      plotOutput("scatterPlot"),
       tableOutput(
         outputId = "regOutput"
       ),
@@ -21,10 +24,17 @@ shinyUI(
         placeholder="place",
         width=NULL
         ),
-    textOutput(
-      outputId = "string1"
-      ,inline=FALSE
-    )
+
+        selectInput(
+        inputId="x",
+        label="説明変数",
+        choices=c("Petal.Length","Petal.Width","Sepal.Length","Sepal.Width")
+        ),
+        selectInput(
+        inputId="y",
+        label="目的変数",
+        choices=c("Petal.Length","Petal.Width","Sepal.Length","Sepal.Width")
+        )
     )
   )
 )
