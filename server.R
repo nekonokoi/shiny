@@ -18,15 +18,26 @@ if(input$select_table == ""){
   res<-iris
 }else{
 q <- paste("select * from ",input$select_table)
-print(q)
+
 res <- dbGetQuery(con, q)
 }
 head(res)
 })
 
-file.list <-   list.files('./data/')
+file.list <- list.files('./data/')
 observe({
   updateSelectInput(session, "select_file", choices = file.list)
+})
+
+f_res <-reactive({
+  path<-paste0('./data/',input$select_file)
+  print(path)
+  dat<-read.csv(path)
+  head(dat)
+})
+
+output$choice_file<-renderTable({
+f_res()
 })
 
 

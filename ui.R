@@ -4,6 +4,7 @@ shinyUI(
   pageWithSidebar(
     headerPanel = headerPanel(title="iris hist"),
     mainPanel = mainPanel(
+    tableOutput("choice_file"),
     tableOutput("choice_table"),
     plotOutput("multi.chart"),
     tableOutput(
