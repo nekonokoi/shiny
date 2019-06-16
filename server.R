@@ -126,6 +126,11 @@ observeEvent(input$rpartButton,{
   rpart_res$res<-res
 }
 )
+output$rpartText<-renderPrint({
+  summary(rpart_res$res)
+
+}
+)
 
 output$rparttext<-renderPlot(
   {

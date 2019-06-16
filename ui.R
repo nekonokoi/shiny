@@ -51,6 +51,7 @@ shinyUI(
                 sidebarLayout(
                   sidebarPanel=sidebarPanel(actionButton("rpartButton",label="rpart")),
                   mainPanel=mainPanel(
+                    verbatimTextOutput("rpartText"),
                     plotOutput("rparttext")
                   )
                 )
