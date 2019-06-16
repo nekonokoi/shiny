@@ -140,6 +140,17 @@ observeEvent(input$testButton,{
 output$testText<-renderPrint({
   test_res$res
 })
+clust_res<-reactiveValues()
+observeEvent(input$clustButton,{
+  cls <- kmeans(f_res(),as.numeric(input$n_cls))
+  clust_res$res<-cls
+
+
+})
+output$clsText<-renderPrint({
+  clust_res$res
+
+})
 
 rpart_res<-reactiveValues()
 observeEvent(input$rpartButton,{

@@ -80,6 +80,22 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("クラスタリング",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    actionButton("clustButton",label="クラスタリング"),
+                    selectInput(
+                      inputId="n_cls",
+                      label="クラスター数",
+                      choices=c(2,3,4,5,6)
+                    )
+                  ),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("clsText")
+                  )
+                )
+              ),
               tabPanel("残り",
                 sidebarLayout(
                   mainPanel = mainPanel(
