@@ -17,7 +17,7 @@ shinyUI(
               )
             )
           ),
-          tabPanel("page2",
+          tabPanel("カラム情報",
             plotOutput("multi.chart")
           ),
 

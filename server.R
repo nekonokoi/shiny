@@ -1,5 +1,7 @@
 library(shiny)
 library(dplyr)
+library(ggplot2)
+
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
 res=summary(mdl)
@@ -21,7 +23,7 @@ q <- paste("select * from ",input$select_table)
 
 res <- dbGetQuery(con, q)
 }
-head(res)
+  res
 })
 
 file.list <- list.files('./data/')
@@ -33,11 +35,11 @@ f_res <-reactive({
   path<-paste0('./data/',input$select_file)
   print(path)
   dat<-read.csv(path)
-  head(dat)
+  dat
 })
 
 output$choice_file<-renderTable({
-f_res()
+head(f_res())
 })
 
 
@@ -48,17 +50,31 @@ q_res()
 
 output$multi.chart<-renderPlot({
   par(mfrow=c(3,2))
-  name <- names(iris)
+  dat <- f_res()
+  name <- names(dat)
   for(n in 1:length(name)){
+    print(class(dat[,name[n]]))
     if(
-      class(iris[,name[n]]) == "numeric"
+      class(dat[,name[n]]) == "numeric"
+      | class(dat[,name[n]]) == "integer"
     ){
-    hist(iris[,name[n]])
-    }else if(class(iris[,name[n]]) == "factor"){
-      d<-iris %>% select(name[n])%>% group_by_(name[n]) %>% summarize(n = n())
-      barplot(d$n,horiz=T)
+    hist(dat[,name[n]])
+    }else if(class(dat[,name[n]]) == "factor"){
+      d<-dat %>% select(name[n])%>% group_by_(name[n]) %>% summarize(n = n())
+      tryCatch(
+        {
+          d2<-d %>% mutate_(ch=as.character(name[n])) %>% mutate(date=as.Date(ch))
+
+plot(x=d2$date,y=d2$n)
+        },
+        error=function(e){
+
+          d<-dat %>% select(name[n])%>% group_by_(name[n]) %>% summarize(n = n())
+          barplot(d$n,horiz=T)
+        }
+      )
+      }
     }
-  }
 })
 
 # 事前に使うデータをつくる
