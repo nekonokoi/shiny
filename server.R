@@ -32,6 +32,8 @@ observe({
   updateSelectInput(session, "select_file", choices = file.list)
 })
 
+
+
 f_res <-reactive({
   path<-paste0('./data/',input$select_file)
   delim = input$file_delim
@@ -82,13 +84,26 @@ reg_y_choices <-  ""
 observeEvent(input$useButton,{
   reg_y_choices<-{names(f_res())}
   updateSelectInput(session, "y", choices = reg_y_choices)
+
+  updateCheckboxGroupInput(
+    session,
+    inputId="xs",
+    label = "説明変数",
+    choices = reg_y_choices,
+    selected = NULL,
+    inline = FALSE
+    #choiceNames = NULL,
+    #choiceValues = NULL
+    )
 })
+
 
 res<-reactiveValues()
 observeEvent(input$regButton,{
   dat <- data.frame(f_res())
+  xs<-paste(input$xs,collapse="+")
   mdl<-lm(
-    formula=as.formula(paste0(input$y,"~.")),
+    formula=as.formula(paste0(input$y,"~",xs)),
     data=dat
   )
   res$res<-summary(mdl)
@@ -97,8 +112,9 @@ observeEvent(input$regButton,{
 logit_res<-reactiveValues()
 observeEvent(input$logitButton,{
   dat <- data.frame(f_res())
+  xs<-paste(input$xs,collapse="+")
   res<-glm(
-    formula=as.formula(paste0(input$y , '~.')),
+    formula=as.formula(paste0(input$y , '~',xs)),
     data=dat,
     family=binomial
   )
@@ -117,9 +133,10 @@ rpart_res<-reactiveValues()
 observeEvent(input$rpartButton,{
 
   dat <- data.frame(f_res())
+    xs<-paste(input$xs,collapse="+")
 
   res<-rpart(
-    formula = as.formula(paste0(input$y , '~.')),
+    formula = as.formula(paste0(input$y , '~',xs)),
     data = dat,
     method = 'class',
     parms = list(split='information')
@@ -140,10 +157,6 @@ output$rparttext<-renderPlot(
   }
 )
 
-# 事前に使うデータをつくる
-data <- reactive({
-  iris[,c(input$x)]
-})
 
 output$view <- renderTable(
 head(f_res(),100)

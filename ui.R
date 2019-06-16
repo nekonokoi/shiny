@@ -28,10 +28,10 @@ shinyUI(
               tabPanel("回帰",
                 sidebarLayout(
                   sidebarPanel = sidebarPanel(
-                    selectInput(
-                      inputId="x",
+                    checkboxGroupInput(
+                      inputId="xs",
                       label="説明変数",
-                      choices=c("Petal.Length","Petal.Width","Sepal.Length","Sepal.Width")
+                      choices=""
                     ),
                     selectInput(
                       inputId="y",
