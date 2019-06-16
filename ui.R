@@ -46,6 +46,14 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("決定木",
+                sidebarLayout(
+                  sidebarPanel=sidebarPanel(actionButton("rpartButton",label="rpart")),
+                  mainPanel=mainPanel(
+                    plotOutput("rparttext")
+                  )
+                )
+              ),
               tabPanel("残り",
                 sidebarLayout(
                   mainPanel = mainPanel(

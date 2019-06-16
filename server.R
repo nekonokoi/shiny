@@ -1,6 +1,7 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
+library(rpart)
 
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
@@ -86,19 +87,33 @@ observeEvent(input$useButton,{
 
 res<-reactiveValues()
 observeEvent(input$regButton,{
-  print(f_res())
-  print('a')
   dat <- data.frame(f_res())
-  print('b')
-  x<-dat #%>% select_(-input$y)
   y<-dat[,input$y]
-  print('c')
   mdl<-lm(y~.,data=dat)
-  print('d')
   res$res<-summary(mdl)
-  print(res)
 })
 
+rpart_res<-reactiveValues()
+observeEvent(input$rpartButton,{
+
+  dat <- data.frame(f_res())
+  y<-dat[,input$y]
+
+  res<-rpart(
+    formula = y ~ .,
+    data = dat,
+    method = 'class',
+    parms = list(split='information')
+  )
+  rpart_res$res<-res
+}
+)
+
+output$rparttext<-renderPlot(
+  {
+  plot(rpart_res$res)
+  }
+)
 
 # 事前に使うデータをつくる
 data <- reactive({
