@@ -129,7 +129,17 @@ output$logitText<-renderPrint({
 
 }
 )
+test_res<-reactiveValues()
+observeEvent(input$testButton,{
+  a<-f_res()[1]
+  b<-f_res()[2]
+  res<-t.test(a,b,var.equal=T)
+  test_res$res<-res
 
+})
+output$testText<-renderPrint({
+  test_res$res
+})
 
 rpart_res<-reactiveValues()
 observeEvent(input$rpartButton,{

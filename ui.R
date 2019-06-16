@@ -25,6 +25,21 @@ shinyUI(
 
           tabPanel("アナリティクス",
             tabsetPanel(
+              tabPanel("検定",
+                sidebarLayout(
+                  sidebarPanel = sidebarPanel(
+                    selectInput(
+                      inputId="test_name",
+                      label="テスト種類",
+                      choices=c("対応ありt検定")
+                    ),
+                    actionButton(inputId="testButton", label="検定を行う", icon = NULL, width = NULL)
+                  ),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("testText")
+                  )
+                )
+              ),
               tabPanel("回帰",
                 sidebarLayout(
                   sidebarPanel = sidebarPanel(
