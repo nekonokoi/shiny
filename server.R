@@ -22,9 +22,15 @@ print(q)
 res <- dbGetQuery(con, q)
 }
 head(res)
-
-
 })
+
+file.list <-   list.files('./data/')
+observe({
+  updateSelectInput(session, "select_file", choices = file.list)
+})
+
+
+
 output$choice_table<-renderTable({
 q_res()
 })

@@ -18,6 +18,8 @@ shinyUI(
     ),
 
     sidebarPanel = sidebarPanel(
+    selectInput("select_file", label = "fileリスト", choices = ""),
+
     selectInput("select_table", label = "テーブルリスト", choices = ""),
       #引数としてつないでいく
       textInput(
