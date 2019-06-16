@@ -13,6 +13,22 @@ observe({
   updateSelectInput(session, "select_table", choices = table.lists)
 })
 
+q_res <- reactive({
+if(input$select_table == ""){
+  res<-iris
+}else{
+q <- paste("select * from ",input$select_table)
+print(q)
+res <- dbGetQuery(con, q)
+}
+head(res)
+
+
+})
+output$choice_table<-renderTable({
+q_res()
+})
+
 output$multi.chart<-renderPlot({
   par(mfrow=c(3,2))
   name <- names(iris)
