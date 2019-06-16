@@ -41,9 +41,10 @@ shinyUI(
                     actionButton(inputId="regButton", label="回帰を行う", icon = NULL, width = NULL)
                   ),
                   mainPanel=mainPanel(
-                    tableOutput(outputId = "regOutput"),
-                    plotOutput("distPlot"),
-                    plotOutput("qqPlot")
+                    verbatimTextOutput("regText"),
+                    tableOutput(outputId = "regOutput")
+                    #plotOutput("distPlot"),
+                    #plotOutput("qqPlot")
                   )
                 )
               ),

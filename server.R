@@ -81,15 +81,16 @@ plot(x=d2$date,y=d2$n)
 reg_y_choices <-  ""
 observeEvent(input$useButton,{
   reg_y_choices<-{names(f_res())}
-  print(reg_y_choices)
   updateSelectInput(session, "y", choices = reg_y_choices)
 })
 
 res<-reactiveValues()
 observeEvent(input$regButton,{
   dat <- data.frame(f_res())
-  y<-dat[,input$y]
-  mdl<-lm(y~.,data=dat)
+  mdl<-lm(
+    formula=as.formula(paste0(input$y,"~.")),
+    data=dat
+  )
   res$res<-summary(mdl)
 })
 
@@ -157,7 +158,10 @@ head(f_res(),100)
       hist(res$res$residuals)
     }
   )
+  output$regText<-renderPrint({
+    res$res
 
+  })
   output$regOutput=renderTable(
     {
     a <- res$res$coefficients
