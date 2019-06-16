@@ -52,9 +52,11 @@ q_res()
 })
 
 output$multi.chart<-renderPlot({
-  par(mfrow=c(3,2))
+
   dat <- f_res()
   name <- names(dat)
+  rows <- ceiling(length(name)/2)
+  par(mfrow=c(rows,2))
   for(n in 1:length(name)){
     print(class(dat[,name[n]]))
     if(

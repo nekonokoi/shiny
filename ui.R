@@ -23,7 +23,7 @@ shinyUI(
             plotOutput("multi.chart")
           ),
 
-          tabPanel("page3",
+          tabPanel("アナリティクス",
             tabsetPanel(
               tabPanel("回帰",
                 sidebarLayout(
