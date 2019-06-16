@@ -10,6 +10,7 @@ shinyUI(
             sidebarLayout(
               sidebarPanel = sidebarPanel(
                 selectInput("select_file", label = "fileリスト", choices = ""),
+                selectInput("file_delim",label="ファイル形式",choices=c(',',' ','\t')),
                 actionButton(inputId="useButton", label="このデータを使う", icon = NULL, width = NULL)
               ),
               mainPanel=mainPanel(
@@ -51,6 +52,14 @@ shinyUI(
                   sidebarPanel=sidebarPanel(actionButton("rpartButton",label="rpart")),
                   mainPanel=mainPanel(
                     plotOutput("rparttext")
+                  )
+                )
+              ),
+              tabPanel("ロジット",
+                sidebarLayout(
+                  sidebarPanel=sidebarPanel(actionButton("logitButton",label="logit")),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("logitText")
                   )
                 )
               ),

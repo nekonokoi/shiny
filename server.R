@@ -34,8 +34,8 @@ observe({
 
 f_res <-reactive({
   path<-paste0('./data/',input$select_file)
-  print(path)
-  dat<-read.csv(path)
+  delim = input$file_delim
+  dat<-read.csv(path,sep=delim)
   dat
 })
 
@@ -93,14 +93,32 @@ observeEvent(input$regButton,{
   res$res<-summary(mdl)
 })
 
+logit_res<-reactiveValues()
+observeEvent(input$logitButton,{
+  dat <- data.frame(f_res())
+  res<-glm(
+    formula=as.formula(paste0(input$y , '~.')),
+    data=dat,
+    family=binomial
+  )
+  logit_res$res<-res
+}
+)
+
+output$logitText<-renderPrint({
+  summary(logit_res$res)
+
+}
+)
+
+
 rpart_res<-reactiveValues()
 observeEvent(input$rpartButton,{
 
   dat <- data.frame(f_res())
-  y<-dat[,input$y]
 
   res<-rpart(
-    formula = y ~ .,
+    formula = as.formula(paste0(input$y , '~.')),
     data = dat,
     method = 'class',
     parms = list(split='information')
@@ -112,6 +130,7 @@ observeEvent(input$rpartButton,{
 output$rparttext<-renderPlot(
   {
   plot(rpart_res$res)
+  text(rpart_res$res)
   }
 )
 
