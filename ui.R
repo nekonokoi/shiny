@@ -9,7 +9,8 @@ shinyUI(
             "データ選択",
             sidebarLayout(
               sidebarPanel = sidebarPanel(
-                selectInput("select_file", label = "fileリスト", choices = "")
+                selectInput("select_file", label = "fileリスト", choices = ""),
+                actionButton(inputId="useButton", label="このデータを使う", icon = NULL, width = NULL)
               ),
               mainPanel=mainPanel(
                 h1('aaa'),
@@ -34,11 +35,11 @@ shinyUI(
                     selectInput(
                       inputId="y",
                       label="目的変数",
-                      choices=c("Petal.Length","Petal.Width","Sepal.Length","Sepal.Width")
-                    )
+                      choices=""
+                    ),
+                    actionButton(inputId="regButton", label="回帰を行う", icon = NULL, width = NULL)
                   ),
                   mainPanel=mainPanel(
-                    plotOutput("scatterPlot"),
                     tableOutput(outputId = "regOutput"),
                     plotOutput("distPlot"),
                     plotOutput("qqPlot")

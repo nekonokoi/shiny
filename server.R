@@ -76,51 +76,59 @@ plot(x=d2$date,y=d2$n)
       }
     }
 })
+# 回帰
+reg_y_choices <-  ""
+observeEvent(input$useButton,{
+  reg_y_choices<-{names(f_res())}
+  print(reg_y_choices)
+  updateSelectInput(session, "y", choices = reg_y_choices)
+})
+
+res<-reactiveValues()
+observeEvent(input$regButton,{
+  print(f_res())
+  print('a')
+  dat <- data.frame(f_res())
+  print('b')
+  x<-dat #%>% select_(-input$y)
+  y<-dat[,input$y]
+  print('c')
+  mdl<-lm(y~.,data=dat)
+  print('d')
+  res$res<-summary(mdl)
+  print(res)
+})
+
 
 # 事前に使うデータをつくる
 data <- reactive({
-  iris[,c(input$x,input$y)]
+  iris[,c(input$x)]
 })
 
 output$view <- renderTable(
-head(data())
+head(f_res(),100)
 )
 
 # 事前に使うモデルを作る
-# reactiveとisolate
-res <- reactive({
-i1 <- iris
-x<-iris[,input$x]
-y<-iris[,input$y]
 
-mdl=lm(y~x)
-res=summary(mdl)
-return(res)
-})
-  output$scatterPlot <- renderPlot(
-    {
-      plot(data())
-    }
-  )
   #代入なので,はいらない
   output$string1=renderText(input$string1)
   output$distPlot<-renderPlot(
     {
-      hist(res()$residuals)
+      hist(res$res$residuals)
     }
   )
 
   output$regOutput=renderTable(
     {
-    a <- res()
-    a$coefficients
+    a <- res$res$coefficients
     }
   )
 
   output$qqPlot<-renderPlot(
     {
       x<-data()[,1]
-      y<-data()[,2]
+      y<-data()[,1]
       qqplot(x,y)
     }
   )
