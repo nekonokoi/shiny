@@ -3,8 +3,15 @@ library(dplyr)
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
 res=summary(mdl)
+library("RSQLite")
+con = dbConnect(SQLite(), "~/Desktop/test", synchronous="off")
 
-shinyServer(function(input,output){
+
+shinyServer(function(input,output,session){
+table.lists<- dbListTables(con)
+observe({
+  updateSelectInput(session, "select_table", choices = table.lists)
+})
 
 output$multi.chart<-renderPlot({
   par(mfrow=c(3,2))

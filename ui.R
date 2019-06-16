@@ -17,6 +17,7 @@ shinyUI(
     ),
 
     sidebarPanel = sidebarPanel(
+    selectInput("select_table", label = "テーブルリスト", choices = ""),
       #引数としてつないでいく
       textInput(
         inputId = "string1",
