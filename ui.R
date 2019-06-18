@@ -20,7 +20,7 @@ shinyUI(
             )
           ),
           tabPanel("カラム情報",
-            plotOutput("multi.chart")
+            plotOutput("multi.chart",height="1000px")
           ),
 
           tabPanel("アナリティクス",
