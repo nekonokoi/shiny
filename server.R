@@ -2,13 +2,12 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(rpart)
-library(tidyverse)
 
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
 res=summary(mdl)
 library("RSQLite")
-con = dbConnect(SQLite(), "./db/myr.db", synchronous="off")
+con = dbConnect(SQLite(), "~/Desktop/test", synchronous="off")
 
 
 shinyServer(function(input,output,session){
@@ -38,8 +37,7 @@ observe({
 f_res <-reactive({
   path<-paste0('./data/',input$select_file)
   delim = input$file_delim
-  #dat<-read.csv(path,sep=delim)
-  dat<-data.frame(read_csv(path))
+  dat<-read.csv(path,sep=delim)
   dat
 })
 
@@ -65,28 +63,21 @@ output$multi.chart<-renderPlot({
       class(dat[,name[n]]) == "numeric"
       | class(dat[,name[n]]) == "integer"
     ){
-    hist(dat[,name[n]],main=name[n])
-    }else if(class(dat[,name[n]]) == "factor"
-      |class(dat[,name[n]]) == "character"
-      ){
+    hist(dat[,name[n]])
+    }else if(class(dat[,name[n]]) == "factor"){
       d<-dat %>% select(name[n])%>% group_by_(name[n]) %>% summarize(n = n())
       tryCatch(
         {
           d2<-d %>% mutate_(ch=as.character(name[n])) %>% mutate(date=as.Date(ch))
 
-plot(x=d2$date,y=d2$n,main=name[n])
+plot(x=d2$date,y=d2$n)
         },
         error=function(e){
 
           d<-dat %>% select(name[n])%>% group_by_(name[n]) %>% summarize(n = n())
-          barplot(d$n,horiz=T,main=name[n])
+          barplot(d$n,horiz=T)
         }
       )
-      }
-      else if(class(dat[,name[n]]) == "Date"){
-        d<-dat %>% select(name[n])%>% group_by_(name[n]) %>% summarize(n = n())
-        plot(x=d[,name[n]],y=d$n,main=name[n])
-
       }
     }
 })
