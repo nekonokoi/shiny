@@ -80,6 +80,17 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("ランダムフォレスト ",
+                sidebarLayout(
+                  sidebarPanel=sidebarPanel(actionButton("rfButton",label="ランダムフォレスト ")),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("rfText"),
+                    verbatimTextOutput("rfImportance")
+
+                  )
+                )
+              ),
+
               tabPanel("クラスタリング",
                 sidebarLayout(
 

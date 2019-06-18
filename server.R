@@ -2,6 +2,7 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(rpart)
+library(randomForest)
 
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
@@ -172,6 +173,32 @@ output$rpartText<-renderPrint({
 
 }
 )
+
+rf_res<-reactiveValues()
+observeEvent(input$rfButton,{
+
+  dat <- data.frame(f_res())
+    xs<-paste(input$xs,collapse="+")
+
+  res<-randomForest(
+    formula = as.formula(paste0(input$y , '~',xs)),
+    data = dat
+    )
+  rf_res$res<-res
+}
+)
+output$rfText<-renderPrint({
+  rf_res$res
+
+}
+)
+
+output$rfImportance<-renderPrint({
+  importance(rf_res$res)
+
+}
+)
+
 
 output$rparttext<-renderPlot(
   {
