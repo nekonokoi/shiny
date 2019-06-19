@@ -107,6 +107,23 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("アプリオリ",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    actionButton("aprioriButton",label="アプリオリ")
+                  ),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("aprioriText1"),
+                    plotOutput("aprioriPlot"),
+                    verbatimTextOutput("aprioriText2"),
+                    tableOutput("aprioriRule"),
+                    plotOutput("aprioriNetwork")
+
+
+                  )
+                )
+              ),
               tabPanel("残り",
                 sidebarLayout(
                   mainPanel = mainPanel(
