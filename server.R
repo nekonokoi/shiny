@@ -3,6 +3,8 @@ library(dplyr)
 library(ggplot2)
 library(rpart)
 library(tidyverse)
+library(arules)
+library(arulesViz)
 
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
@@ -39,7 +41,7 @@ f_res <-reactive({
   path<-paste0('./data/',input$select_file)
   delim = input$file_delim
   #dat<-read.csv(path,sep=delim)
-  dat<-data.frame(read_csv(path))
+  dat<-data.frame(read_delim(path,delim=delim))
   dat
 })
 
@@ -220,5 +222,37 @@ head(f_res(),100)
       qqplot(x,y)
     }
   )
+  apriori_res <- reactiveValues()
+  observeEvent(input$aprioriButton,{
+    #データの作成
+    apriori_res$dat <- as(as.matrix(f_res()),"transactions")
+    apriori_res$rule <- apriori(apriori_res$dat)
+
+
+
+  })
+
+  output$aprioriText1 <- renderPrint({
+    summary(apriori_res$dat)
+  })
+
+  output$aprioriPlot <- renderPlot({
+    itemFrequencyPlot(apriori_res$dat)
+  })
+
+  output$apiroriText2 <- renderPrint({
+    summary(apriori_res$rule)
+
+  })
+  output$aprioriRule <- renderTable({
+    inspect(head(apriori_res$rule,30))
+  })
+
+  output$aprioriNetwork<-renderPlot({
+    plot(apriori_res$rule,
+      method="graph",
+      control=list(type="items",cex=2)
+    )
+  })
 
 })
