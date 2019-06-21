@@ -20,6 +20,7 @@ shinyUI(
             )
           ),
           tabPanel("カラム情報",
+            plotOutput("pairPlot"),
             plotOutput("multi.chart",height="1000px")
           ),
 
@@ -124,6 +125,35 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("時系列",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    selectInput(
+                      "tsTime",
+                      "時系列カラム",
+                      choices = c("7","30","12","365")
+                    ),
+                    textInput(
+                      "tsStart",
+                      label="開始時期",
+                      value=""
+                    ),
+                    actionButton("tsButton",label="ARIMA")
+
+                  ),
+                  mainPanel=mainPanel(
+                    plotOutput("tsDecompose"),
+                    verbatimTextOutput("adfTest"),
+                    plotOutput("pacf"),
+                    verbatimTextOutput("arimaFit")
+
+
+
+                  )
+                )
+              ),
+
               tabPanel("残り",
                 sidebarLayout(
                   mainPanel = mainPanel(
