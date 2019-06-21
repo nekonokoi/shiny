@@ -5,6 +5,9 @@ library(rpart)
 library(tidyverse)
 library(arules)
 library(arulesViz)
+library(tseries)
+library(forecast)
+
 
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
@@ -253,6 +256,55 @@ head(f_res(),100)
       method="graph",
       control=list(type="items",cex=2)
     )
+  })
+
+
+  ts_res <- reactiveValues()
+
+  observeEvent(input$tsButton,{
+    dat<-f_res()
+    print(dat)
+    print(input$tsStart)
+    print(input$tsTime)
+    ts_res$dat <-ts(
+      dat[,input$y],
+      start=as.numeric(input$tsStart),
+      frequency=as.numeric(input$tsTime)
+    )
+    print(ts_res)
+
+  })
+
+  output$tsDecompose <- renderPlot({
+    plot(decompose(ts_res$dat))
+  })
+
+  output$adfTest<- renderPrint({
+    adf.test(ts_res$dat)
+  })
+
+  output$pacf <- renderPlot({
+    pacf(ts_res$dat)
+  })
+
+  output$arimaFit <- renderPrint({
+    ts_res$arimaFit <- auto.arima(ts_res$dat,ic="aic",trace=F,stepwise=F,approximation=F,allowmean=F,allowdrift=F)
+    ts_res$arimaFit
+
+
+  })
+
+  output$pairPlot <- renderPlot({
+    f <- function(x) {
+      if(is.numeric(x)){
+        return(TRUE)
+        }
+        else{
+          return(FALSE)
+        }
+      }
+    select_if(f_res(), f) %>% pairs()
+
   })
 
 })
