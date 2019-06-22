@@ -2,7 +2,14 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(rpart)
+library(randomForest)
 library(tidyverse)
+library(arules)
+library(arulesViz)
+library(tseries)
+library(forecast)
+library(survival)
+
 
 iris <- iris
 mdl=lm(Sepal.Length~Sepal.Width,data=iris)
@@ -39,7 +46,7 @@ f_res <-reactive({
   path<-paste0('./data/',input$select_file)
   delim = input$file_delim
   #dat<-read.csv(path,sep=delim)
-  dat<-data.frame(read_csv(path))
+  dat<-data.frame(read_delim(path,delim=delim))
   dat
 })
 
@@ -182,6 +189,32 @@ output$rpartText<-renderPrint({
 }
 )
 
+rf_res<-reactiveValues()
+observeEvent(input$rfButton,{
+
+  dat <- data.frame(f_res())
+    xs<-paste(input$xs,collapse="+")
+
+  res<-randomForest(
+    formula = as.formula(paste0(input$y , '~',xs)),
+    data = dat
+    )
+  rf_res$res<-res
+}
+)
+output$rfText<-renderPrint({
+  rf_res$res
+
+}
+)
+
+output$rfImportance<-renderPrint({
+  importance(rf_res$res)
+
+}
+)
+
+
 output$rparttext<-renderPlot(
   {
   plot(rpart_res$res)
@@ -220,5 +253,129 @@ head(f_res(),100)
       qqplot(x,y)
     }
   )
+  apriori_res <- reactiveValues()
+  observeEvent(input$aprioriButton,{
+    #データの作成
+    apriori_res$dat <- as(as.matrix(f_res()),"transactions")
+    apriori_res$rule <- apriori(apriori_res$dat)
+
+
+
+  })
+
+  output$aprioriText1 <- renderPrint({
+    summary(apriori_res$dat)
+  })
+
+  output$aprioriPlot <- renderPlot({
+    itemFrequencyPlot(apriori_res$dat)
+  })
+
+  output$apiroriText2 <- renderPrint({
+    summary(apriori_res$rule)
+
+  })
+  output$aprioriRule <- renderTable({
+    inspect(head(apriori_res$rule,30))
+  })
+
+  output$aprioriNetwork<-renderPlot({
+    plot(apriori_res$rule,
+      method="graph",
+      control=list(type="items",cex=2)
+    )
+  })
+
+
+  ts_res <- reactiveValues()
+
+  observeEvent(input$tsButton,{
+    dat<-f_res()
+    ts_res$dat <-ts(
+      dat[,input$y],
+      start=as.numeric(input$tsStart),
+      frequency=as.numeric(input$tsTime)
+    )
+    print(ts_res)
+
+  })
+
+  output$tsDecompose <- renderPlot({
+    plot(decompose(ts_res$dat))
+  })
+
+  output$adfTest<- renderPrint({
+    adf.test(ts_res$dat)
+  })
+
+  output$pacf <- renderPlot({
+    pacf(ts_res$dat)
+  })
+
+  output$arimaFit <- renderPrint({
+    ts_res$arimaFit <- auto.arima(ts_res$dat,ic="aic",trace=F,stepwise=F,approximation=F,allowmean=F,allowdrift=F)
+    ts_res$arimaFit
+
+
+  })
+
+  output$pairPlot <- renderPlot({
+    f <- function(x) {
+      if(is.numeric(x)){
+        return(TRUE)
+        }
+        else{
+          return(FALSE)
+        }
+      }
+    select_if(f_res(), f) %>% pairs()
+
+  })
+
+  suv_res <- reactiveValues()
+
+  observeEvent(input$useButton,{
+      suv_dat<-{names(f_res())}
+      updateSelectInput(session, "suv_y", choices = suv_dat)
+      updateSelectInput(session, "suv_censor", choices = suv_dat)
+
+      updateCheckboxGroupInput(
+        session,
+        inputId="suv_xs",
+        label = "説明変数",
+        choices = suv_dat,
+        selected = NULL,
+        inline = FALSE
+        #choiceNames = NULL,
+        #choiceValues = NULL
+        )
+    })
+
+  observeEvent(input$suvButton,{
+    dat<-f_res()
+    ys<-c(input$suv_y,input$suv_censor)
+    xs<-paste(input$suv_xs,collapse="+")
+    suv_y <- paste(ys,collapse=",")
+
+    f<-paste0("Surv(",suv_y,")","~",xs)
+
+
+    mdl<-coxph(
+      formula=as.formula(f),
+      method="breslow",
+      data=dat
+    )
+    suv_res$res<-mdl
+
+  })
+
+  output$suvText<-renderPrint({
+      summary(suv_res$res)
+  })
+
+  output$suvPlot<-renderPlot({
+    kidney.fit <- survfit(suv_res$res)
+    plot(kidney.fit)
+  })
 
 })

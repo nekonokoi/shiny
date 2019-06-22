@@ -20,6 +20,7 @@ shinyUI(
             )
           ),
           tabPanel("カラム情報",
+            plotOutput("pairPlot"),
             plotOutput("multi.chart",height="1000px")
           ),
 
@@ -80,6 +81,17 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("ランダムフォレスト ",
+                sidebarLayout(
+                  sidebarPanel=sidebarPanel(actionButton("rfButton",label="ランダムフォレスト ")),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("rfText"),
+                    verbatimTextOutput("rfImportance")
+
+                  )
+                )
+              ),
+
               tabPanel("クラスタリング",
                 sidebarLayout(
 
@@ -96,6 +108,80 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("アプリオリ",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    actionButton("aprioriButton",label="アプリオリ")
+                  ),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("aprioriText1"),
+                    plotOutput("aprioriPlot"),
+                    verbatimTextOutput("aprioriText2"),
+                    tableOutput("aprioriRule"),
+                    plotOutput("aprioriNetwork")
+
+
+                  )
+                )
+              ),
+              tabPanel("時系列",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    selectInput(
+                      "tsTime",
+                      "時系列カラム",
+                      choices = c("7","30","12","365")
+                    ),
+                    textInput(
+                      "tsStart",
+                      label="開始時期",
+                      value=""
+                    ),
+                    actionButton("tsButton",label="ARIMA")
+
+                  ),
+                  mainPanel=mainPanel(
+                    plotOutput("tsDecompose"),
+                    verbatimTextOutput("adfTest"),
+                    plotOutput("pacf"),
+                    verbatimTextOutput("arimaFit")
+
+
+
+                  )
+                )
+              ),
+              tabPanel("生存時間",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    selectInput(
+                      inputId="suv_y",
+                      label="時間",
+                      choices=""
+                    ),
+                    selectInput(
+                      inputId="suv_censor",
+                      label="打ち切り",
+                      choices=""
+                    ),
+                    checkboxGroupInput(
+                      inputId="suv_xs",
+                      label="説明変数",
+                      choices=""
+                    ),
+                    actionButton("suvButton",label="生存時間")
+
+                  ),
+                  mainPanel=mainPanel(
+                    plotOutput("suvPlot"),
+                    verbatimTextOutput("suvText")
+                  )
+                )
+              ),
+
               tabPanel("残り",
                 sidebarLayout(
                   mainPanel = mainPanel(
