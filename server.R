@@ -307,9 +307,25 @@ head(f_res(),100)
 
   suv_res <- reactiveValues()
 
+  observeEvent(input$useButton,{
+      suv_dat<-{names(f_res())}
+      updateSelectInput(session, "suv_y", choices = suv_dat)
+      updateSelectInput(session, "suv_censor", choices = suv_dat)
+
+      updateCheckboxGroupInput(
+        session,
+        inputId="suv_xs",
+        label = "説明変数",
+        choices = suv_dat,
+        selected = NULL,
+        inline = FALSE
+        #choiceNames = NULL,
+        #choiceValues = NULL
+        )
+    })
+
   observeEvent(input$suvButton,{
-    #dat<-f_res()
-    dat<-kidney
+    dat<-f_res()
     ys<-c(input$suv_y,input$suv_censor)
     xs<-paste(input$suv_xs,collapse="+")
     suv_y <- paste(ys,collapse=",")

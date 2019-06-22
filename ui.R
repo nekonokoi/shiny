@@ -149,17 +149,17 @@ shinyUI(
                     selectInput(
                       inputId="suv_y",
                       label="時間",
-                      choices=c("time")
+                      choices=""
                     ),
                     selectInput(
                       inputId="suv_censor",
                       label="打ち切り",
-                      choices=c("status")
+                      choices=""
                     ),
                     checkboxGroupInput(
                       inputId="suv_xs",
                       label="説明変数",
-                      choices=c("sex","disease")
+                      choices=""
                     ),
                     actionButton("suvButton",label="生存時間")
 
