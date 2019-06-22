@@ -7,6 +7,7 @@ library(arules)
 library(arulesViz)
 library(tseries)
 library(forecast)
+library(survival)
 
 
 iris <- iris
@@ -263,9 +264,6 @@ head(f_res(),100)
 
   observeEvent(input$tsButton,{
     dat<-f_res()
-    print(dat)
-    print(input$tsStart)
-    print(input$tsTime)
     ts_res$dat <-ts(
       dat[,input$y],
       start=as.numeric(input$tsStart),
@@ -305,6 +303,39 @@ head(f_res(),100)
       }
     select_if(f_res(), f) %>% pairs()
 
+  })
+
+  suv_res <- reactiveValues()
+
+  observeEvent(input$suvButton,{
+    #dat<-f_res()
+    dat<-kidney
+
+    #ys<-input$ys
+    ys<-c("time", "status")
+    #xs<-paste(input$xs,collapse="+")
+    xs<-paste(c("sex","disease"),collapse="+")
+    suv_y <- paste(ys,collapse=",")
+
+    f<-paste0("Surv(",suv_y,")","~",xs)
+
+
+    mdl<-coxph(
+      formula=as.formula(f),
+      method="breslow",
+      data=dat
+    )
+    suv_res$res<-mdl
+
+  })
+
+  output$suvText<-renderPrint({
+      summary(suv_res$res)
+  })
+
+  output$suvPlot<-renderPlot({
+    kidney.fit <- survfit(suv_res$res)
+    plot(kidney.fit)
   })
 
 })

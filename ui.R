@@ -142,6 +142,19 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("生存時間",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    actionButton("suvButton",label="生存時間")
+
+                  ),
+                  mainPanel=mainPanel(
+                    plotOutput("suvPlot"),
+                    verbatimTextOutput("suvText")
+                  )
+                )
+              ),
 
               tabPanel("残り",
                 sidebarLayout(
