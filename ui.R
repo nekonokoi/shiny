@@ -146,6 +146,21 @@ shinyUI(
                 sidebarLayout(
 
                   sidebarPanel=sidebarPanel(
+                    selectInput(
+                      inputId="suv_y",
+                      label="時間",
+                      choices=c("time")
+                    ),
+                    selectInput(
+                      inputId="suv_censor",
+                      label="打ち切り",
+                      choices=c("status")
+                    ),
+                    checkboxGroupInput(
+                      inputId="suv_xs",
+                      label="説明変数",
+                      choices=c("sex","disease")
+                    ),
                     actionButton("suvButton",label="生存時間")
 
                   ),

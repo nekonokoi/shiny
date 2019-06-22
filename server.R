@@ -310,11 +310,8 @@ head(f_res(),100)
   observeEvent(input$suvButton,{
     #dat<-f_res()
     dat<-kidney
-
-    #ys<-input$ys
-    ys<-c("time", "status")
-    #xs<-paste(input$xs,collapse="+")
-    xs<-paste(c("sex","disease"),collapse="+")
+    ys<-c(input$suv_y,input$suv_censor)
+    xs<-paste(input$suv_xs,collapse="+")
     suv_y <- paste(ys,collapse=",")
 
     f<-paste0("Surv(",suv_y,")","~",xs)
