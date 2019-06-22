@@ -170,6 +170,29 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("クロス集計",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    selectInput(
+                      inputId="cross_y",
+                      label="y軸",
+                      choices=""
+                    ),
+                    selectInput(
+                      inputId="cross_x",
+                      label="x軸",
+                      choices=""
+                    ),
+                    actionButton("crossButton",label="生存時間")
+
+                  ),
+                  mainPanel=mainPanel(
+                    verbatimTextOutput("crossTable"),
+                    verbatimTextOutput("crossTest")
+                  )
+                )
+              ),
 
               tabPanel("残り",
                 sidebarLayout(

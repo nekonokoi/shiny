@@ -351,4 +351,31 @@ head(f_res(),100)
     plot(kidney.fit)
   })
 
+    cross_res <- reactiveValues()
+    observeEvent(input$useButton,{
+        cross_dat<-{names(f_res())}
+        updateSelectInput(session, "cross_y", choices = cross_dat)
+        updateSelectInput(session, "cross_x", choices = cross_dat)
+
+        })
+
+    observeEvent(input$crossButton,{
+      x <- input$cross_x
+      y <- input$cross_y
+
+      cross_res$res <- xtabs(
+        as.formula(paste0("~",y,"+",x)),
+        data=f_res()
+      )
+    })
+
+    output$crossTable <- renderPrint({
+      print(cross_res$res)
+    })
+
+    output$crossTest <- renderPrint({
+      summary(cross_res$res)
+    })
+
+
 })
