@@ -8,6 +8,7 @@ library(arules)
 library(arulesViz)
 library(tseries)
 library(forecast)
+library(survival)
 
 
 iris <- iris
@@ -290,9 +291,6 @@ head(f_res(),100)
 
   observeEvent(input$tsButton,{
     dat<-f_res()
-    print(dat)
-    print(input$tsStart)
-    print(input$tsTime)
     ts_res$dat <-ts(
       dat[,input$y],
       start=as.numeric(input$tsStart),
@@ -332,6 +330,52 @@ head(f_res(),100)
       }
     select_if(f_res(), f) %>% pairs()
 
+  })
+
+  suv_res <- reactiveValues()
+
+  observeEvent(input$useButton,{
+      suv_dat<-{names(f_res())}
+      updateSelectInput(session, "suv_y", choices = suv_dat)
+      updateSelectInput(session, "suv_censor", choices = suv_dat)
+
+      updateCheckboxGroupInput(
+        session,
+        inputId="suv_xs",
+        label = "説明変数",
+        choices = suv_dat,
+        selected = NULL,
+        inline = FALSE
+        #choiceNames = NULL,
+        #choiceValues = NULL
+        )
+    })
+
+  observeEvent(input$suvButton,{
+    dat<-f_res()
+    ys<-c(input$suv_y,input$suv_censor)
+    xs<-paste(input$suv_xs,collapse="+")
+    suv_y <- paste(ys,collapse=",")
+
+    f<-paste0("Surv(",suv_y,")","~",xs)
+
+
+    mdl<-coxph(
+      formula=as.formula(f),
+      method="breslow",
+      data=dat
+    )
+    suv_res$res<-mdl
+
+  })
+
+  output$suvText<-renderPrint({
+      summary(suv_res$res)
+  })
+
+  output$suvPlot<-renderPlot({
+    kidney.fit <- survfit(suv_res$res)
+    plot(kidney.fit)
   })
 
 })

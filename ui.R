@@ -153,6 +153,34 @@ shinyUI(
                   )
                 )
               ),
+              tabPanel("生存時間",
+                sidebarLayout(
+
+                  sidebarPanel=sidebarPanel(
+                    selectInput(
+                      inputId="suv_y",
+                      label="時間",
+                      choices=""
+                    ),
+                    selectInput(
+                      inputId="suv_censor",
+                      label="打ち切り",
+                      choices=""
+                    ),
+                    checkboxGroupInput(
+                      inputId="suv_xs",
+                      label="説明変数",
+                      choices=""
+                    ),
+                    actionButton("suvButton",label="生存時間")
+
+                  ),
+                  mainPanel=mainPanel(
+                    plotOutput("suvPlot"),
+                    verbatimTextOutput("suvText")
+                  )
+                )
+              ),
 
               tabPanel("残り",
                 sidebarLayout(
