@@ -41,7 +41,7 @@ observe({
 
 
 
-f_res <-reactive({
+f_res_display <-reactive({
   path<-paste0('./data/',input$select_file)
   delim = input$file_delim
   #dat<-read.csv(path,sep=delim)
@@ -50,10 +50,30 @@ f_res <-reactive({
 })
 
 output$choice_file<-renderTable({
-head(f_res())
+head(f_res_display())
+})
+
+f_res <- reactiveValues()
+observeEvent(input$useButton,{
+  f_res$res <- f_res_display()
+})
+
+prep_data <- reactiveValues()
+
+observeEvent(input$prepButton,{
+
+  cmd <- paste0('dat %>%',input$data_prep)
+  dat <- f_res$res
+
+  res<-eval(parse(text=cmd))
+
+  prep_data$res<-res
 })
 
 
+observeEvent(input$prepUseButton,{
+  f_res$res<-prep_data$res
+})
 
 output$choice_table<-renderTable({
 q_res()
@@ -61,7 +81,7 @@ q_res()
 
 output$multi.chart<-renderPlot({
 
-  dat <- f_res()
+  dat <- f_res$res
   name <- names(dat)
   rows <- ceiling(length(name)/2)
   par(mfrow=c(rows,2))
@@ -99,7 +119,7 @@ plot(x=d2$date,y=d2$n,main=name[n])
 # 回帰
 reg_y_choices <-  ""
 observeEvent(input$useButton,{
-  reg_y_choices<-{names(f_res())}
+  reg_y_choices<-{names(f_res$res)}
   updateSelectInput(session, "y", choices = reg_y_choices)
 
   updateCheckboxGroupInput(
@@ -117,7 +137,7 @@ observeEvent(input$useButton,{
 
 res<-reactiveValues()
 observeEvent(input$regButton,{
-  dat <- data.frame(f_res())
+  dat <- data.frame(f_res$res)
   xs<-paste(input$xs,collapse="+")
   mdl<-lm(
     formula=as.formula(paste0(input$y,"~",xs)),
@@ -128,7 +148,7 @@ observeEvent(input$regButton,{
 
 logit_res<-reactiveValues()
 observeEvent(input$logitButton,{
-  dat <- data.frame(f_res())
+  dat <- data.frame(f_res$res)
   xs<-paste(input$xs,collapse="+")
   res<-glm(
     formula=as.formula(paste0(input$y , '~',xs)),
@@ -146,8 +166,8 @@ output$logitText<-renderPrint({
 )
 test_res<-reactiveValues()
 observeEvent(input$testButton,{
-  a<-f_res()[1]
-  b<-f_res()[2]
+  a<-f_res$res[1]
+  b<-f_res$res[2]
   res<-t.test(a,b,var.equal=T)
   test_res$res<-res
 
@@ -157,7 +177,7 @@ output$testText<-renderPrint({
 })
 clust_res<-reactiveValues()
 observeEvent(input$clustButton,{
-  cls <- kmeans(f_res(),as.numeric(input$n_cls))
+  cls <- kmeans(f_res$res,as.numeric(input$n_cls))
   clust_res$res<-cls
 
 
@@ -170,7 +190,7 @@ output$clsText<-renderPrint({
 rpart_res<-reactiveValues()
 observeEvent(input$rpartButton,{
 
-  dat <- data.frame(f_res())
+  dat <- data.frame(f_res$res)
     xs<-paste(input$xs,collapse="+")
 
   res<-rpart(
@@ -197,7 +217,7 @@ output$rparttext<-renderPlot(
 
 
 output$view <- renderTable(
-head(f_res(),100)
+head(f_res$res,100)
 )
 
 # 事前に使うモデルを作る
@@ -229,7 +249,7 @@ head(f_res(),100)
   apriori_res <- reactiveValues()
   observeEvent(input$aprioriButton,{
     #データの作成
-    apriori_res$dat <- as(as.matrix(f_res()),"transactions")
+    apriori_res$dat <- as(as.matrix(f_res$res),"transactions")
     apriori_res$rule <- apriori(apriori_res$dat)
 
 
@@ -263,7 +283,7 @@ head(f_res(),100)
   ts_res <- reactiveValues()
 
   observeEvent(input$tsButton,{
-    dat<-f_res()
+    dat<-f_res$res
     ts_res$dat <-ts(
       dat[,input$y],
       start=as.numeric(input$tsStart),
@@ -301,14 +321,14 @@ head(f_res(),100)
           return(FALSE)
         }
       }
-    select_if(f_res(), f) %>% pairs()
+    select_if(f_res$res, f) %>% pairs()
 
   })
 
   suv_res <- reactiveValues()
 
   observeEvent(input$useButton,{
-      suv_dat<-{names(f_res())}
+      suv_dat<-{names(f_res$res)}
       updateSelectInput(session, "suv_y", choices = suv_dat)
       updateSelectInput(session, "suv_censor", choices = suv_dat)
 
@@ -325,7 +345,7 @@ head(f_res(),100)
     })
 
   observeEvent(input$suvButton,{
-    dat<-f_res()
+    dat<-f_res$res
     ys<-c(input$suv_y,input$suv_censor)
     xs<-paste(input$suv_xs,collapse="+")
     suv_y <- paste(ys,collapse=",")
@@ -353,7 +373,7 @@ head(f_res(),100)
 
     cross_res <- reactiveValues()
     observeEvent(input$useButton,{
-        cross_dat<-{names(f_res())}
+        cross_dat<-{names(f_res$res)}
         updateSelectInput(session, "cross_y", choices = cross_dat)
         updateSelectInput(session, "cross_x", choices = cross_dat)
 
@@ -365,7 +385,7 @@ head(f_res(),100)
 
       cross_res$res <- xtabs(
         as.formula(paste0("~",y,"+",x)),
-        data=f_res()
+        data=f_res$res
       )
     })
 

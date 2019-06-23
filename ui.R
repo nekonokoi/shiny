@@ -23,6 +23,19 @@ shinyUI(
             plotOutput("pairPlot"),
             plotOutput("multi.chart",height="1000px")
           ),
+          tabPanel("データ加工",
+          sidebarLayout(
+            sidebarPanel = sidebarPanel(
+
+              textAreaInput("data_prep",label="コマンド",),
+              actionButton(inputId="prepButton", label="この操作を実施", icon = NULL, width = NULL)
+            ),
+            mainPanel=mainPanel(
+              h1('aaa'),
+              tableOutput("prep_table")
+            )
+          )
+          ),
 
           tabPanel("アナリティクス",
             tabsetPanel(
