@@ -8,6 +8,7 @@ library(arulesViz)
 library(tseries)
 library(forecast)
 library(survival)
+library(tidytext)
 
 
 iris <- iris
@@ -37,6 +38,8 @@ res <- dbGetQuery(con, q)
 file.list <- list.files('./data/')
 observe({
   updateSelectInput(session, "select_file", choices = file.list)
+  updateSelectInput(session, "select_text_file", choices = file.list)
+
 })
 
 
@@ -93,6 +96,22 @@ output$choice_table<-renderTable({
 q_res()
 })
 
+
+text_res <- reactiveValues()
+
+observeEvent(input$tidyTextButton,{
+  col<-input$select_text_col
+  dat<-as.tibble(f_res_display())
+  cmd = paste0("dat %>% unnest_tokens(word,",col,")")
+  res<- eval(parse(text=cmd))
+  text_res$res <- res
+})
+
+
+output$textData <- renderTable({
+  text_res$res
+})
+
 output$multi.chart<-renderPlot({
 
   dat <- f_res$res
@@ -146,6 +165,8 @@ observeEvent(input$useButton,{
     #choiceNames = NULL,
     #choiceValues = NULL
     )
+
+  updateSelectInput(session, "select_text_col", choices = reg_y_choices)
 })
 
 

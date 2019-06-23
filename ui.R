@@ -49,6 +49,18 @@ shinyUI(
             )
           )
           ),
+          tabPanel("テキストマイニング",
+          sidebarLayout(
+            sidebarPanel = sidebarPanel(
+              selectInput("select_text_col", label = "対象カラム", choices = ""),
+              actionButton(inputId="tidyTextButton", label="テキストマイニング", icon = NULL, width = NULL)
+            ),
+            mainPanel=mainPanel(
+              h1('テキストマイニング'),
+              tableOutput("textData")
+            )
+          )
+          ),
 
           tabPanel("アナリティクス",
             tabsetPanel(
