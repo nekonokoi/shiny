@@ -70,10 +70,24 @@ observeEvent(input$prepButton,{
   prep_data$res<-res
 })
 
-
-observeEvent(input$prepUseButton,{
-  f_res$res<-prep_data$res
+cmd.list <- list.files('./cmd/')
+observe({
+  updateSelectInput(session, "select_cmd_file", choices = cmd.list)
 })
+
+output$cmd_text <- renderPrint({
+  path <- paste0('./cmd/',input$select_cmd_file)
+  v <- scan(path, what = character(), sep = "", blank.lines.skip = F)
+  print(paste0(v,collapse=''))
+})
+
+output$cmd_res <- renderTable({
+  path <- paste0('./cmd/',input$select_cmd_file)
+  res<-eval(parse(file=path))
+  head(res,15)
+
+})
+
 
 output$choice_table<-renderTable({
 q_res()

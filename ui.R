@@ -36,6 +36,19 @@ shinyUI(
             )
           )
           ),
+          tabPanel("データセット作成",
+          sidebarLayout(
+            sidebarPanel = sidebarPanel(
+              selectInput("select_cmd_file", label = "fileリスト", choices = ""),
+              actionButton(inputId="useCmdButton", label="このコマンドを使う", icon = NULL, width = NULL)
+            ),
+            mainPanel=mainPanel(
+              h1('aaa'),
+              verbatimTextOutput("cmd_text"),
+              tableOutput("cmd_res")
+            )
+          )
+          ),
 
           tabPanel("アナリティクス",
             tabsetPanel(
