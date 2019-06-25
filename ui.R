@@ -28,7 +28,8 @@ shinyUI(
             sidebarPanel = sidebarPanel(
 
               textAreaInput("data_prep",label="コマンド",),
-              actionButton(inputId="prepButton", label="この操作を実施", icon = NULL, width = NULL)
+              actionButton(inputId="prepButton", label="この操作を実施", icon = NULL, width = NULL),
+              actionButton(inputId="prepUseButton", label="この操作を反映", icon = NULL, width = NULL)
             ),
             mainPanel=mainPanel(
               h1('aaa'),

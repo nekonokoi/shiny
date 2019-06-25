@@ -17,6 +17,31 @@ res=summary(mdl)
 library("RSQLite")
 con = dbConnect(SQLite(), "./db/myr.db", synchronous="off")
 
+analyticsModelFactory <- function(ys,xs,data,model){
+
+  xs<-paste(xs,collapse="+")
+  formula<-as.formula(paste0(ys , '~',xs))
+
+  if(model=='logit'){
+    mdl <- glm(formula=formula,data=data,family=binomial)
+  }else if(model=='kmeans'){
+    mdl <- kmeans(data[,xs],3)
+  }else if(model=='regression'){
+    mdl <- lm(formula=formula,data=data)
+  }else if(model=='rpart'){
+    mdl <- rpart(
+      formula=formula,
+      data=data,
+      method = 'class',
+      parms = list(split='information'))
+  }
+  else{
+    stop('not model')
+  }
+  return(mdl)
+
+}
+
 
 shinyServer(function(input,output,session){
 table.lists<- dbListTables(con)
@@ -71,6 +96,14 @@ observeEvent(input$prepButton,{
   res<-eval(parse(text=cmd))
 
   prep_data$res<-res
+})
+
+output$prep_table <- renderTable({
+  prep_data$res
+})
+
+observeEvent(input$prepUseButton,{
+  f_res$res<-prep_data$res
 })
 
 cmd.list <- list.files('./cmd/')
@@ -150,6 +183,27 @@ plot(x=d2$date,y=d2$n,main=name[n])
     }
 })
 # 回帰
+reg_dat<-reactive({f_res$res})
+observe({
+reg_y_choices2<-names(reg_dat())
+
+updateSelectInput(session, "y", choices = reg_y_choices2)
+
+updateCheckboxGroupInput(
+  session,
+  inputId="xs",
+  label = "説明変数",
+  choices = reg_y_choices2,
+  selected = NULL,
+  inline = FALSE
+  #choiceNames = NULL,
+  #choiceValues = NULL
+  )
+
+updateSelectInput(session, "select_text_col", choices = reg_y_choices2)
+
+
+})
 reg_y_choices <-  ""
 observeEvent(input$useButton,{
   reg_y_choices<-{names(f_res$res)}
@@ -172,25 +226,16 @@ observeEvent(input$useButton,{
 
 res<-reactiveValues()
 observeEvent(input$regButton,{
-  dat <- data.frame(f_res$res)
-  xs<-paste(input$xs,collapse="+")
-  mdl<-lm(
-    formula=as.formula(paste0(input$y,"~",xs)),
-    data=dat
-  )
+  mdl<-analyticsModelFactory(input$y,input$xs,f_res$res,'regression')
+
   res$res<-summary(mdl)
 })
 
 logit_res<-reactiveValues()
 observeEvent(input$logitButton,{
-  dat <- data.frame(f_res$res)
-  xs<-paste(input$xs,collapse="+")
-  res<-glm(
-    formula=as.formula(paste0(input$y , '~',xs)),
-    data=dat,
-    family=binomial
-  )
-  logit_res$res<-res
+  mdl<-analyticsModelFactory(input$y,input$xs,f_res$res,'logit')
+
+  logit_res$res<-mdl
 }
 )
 
@@ -225,16 +270,8 @@ output$clsText<-renderPrint({
 rpart_res<-reactiveValues()
 observeEvent(input$rpartButton,{
 
-  dat <- data.frame(f_res$res)
-    xs<-paste(input$xs,collapse="+")
-
-  res<-rpart(
-    formula = as.formula(paste0(input$y , '~',xs)),
-    data = dat,
-    method = 'class',
-    parms = list(split='information')
-  )
-  rpart_res$res<-res
+  mdl<-analyticsModelFactory(input$y,input$xs,f_res$res,'rpart')
+  rpart_res$res<-mdl
 }
 )
 output$rpartText<-renderPrint({
@@ -361,6 +398,25 @@ head(f_res$res,100)
   })
 
   suv_res <- reactiveValues()
+
+  suv_dat_raw<-reactive({f_res$res})
+  observe({
+  cols <- names(suv_dat_raw())
+  updateSelectInput(session, "suv_y", choices = cols)
+  updateSelectInput(session, "suv_censor", choices = cols)
+  updateCheckboxGroupInput(
+    session,
+    inputId="suv_xs",
+    label = "説明変数",
+    choices = cols,
+    selected = NULL,
+    inline = FALSE
+    #choiceNames = NULL,
+    #choiceValues = NULL
+    )
+
+  })
+
 
   observeEvent(input$useButton,{
       suv_dat<-{names(f_res$res)}
